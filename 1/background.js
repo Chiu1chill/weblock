@@ -1,7 +1,13 @@
+importScripts("password.js");
+
 const LOCK_DURATION_MS = 12 * 60 * 60 * 1000;
 const ALARM_PREFIX = "weblock-expire-";
+const PASSWORD_VERSION = 1;
 
-chrome.runtime.onInstalled.addListener(() => refreshLocks());
+chrome.runtime.onInstalled.addListener(async () => {
+  await migrateLocks();
+  await refreshLocks();
+});
 chrome.runtime.onStartup.addListener(() => refreshLocks());
 
 chrome.alarms.onAlarm.addListener((alarm) => {
@@ -32,7 +38,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   (async () => {
     if (message.type === "create-lock") {
-      await createLock(message.host, message.salt, message.hash);
+      await createLock(message.host);
       return { ok: true };
     }
 
@@ -54,12 +60,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true;
 });
 
-async function createLock(host, salt, hash) {
+async function createLock(host) {
   const normalizedHost = String(host).toLowerCase();
-  if (!isValidHostname(normalizedHost) || !salt || !hash) {
-    throw new Error("Invalid website or password data.");
+  if (!isValidHostname(normalizedHost)) {
+    throw new Error("Invalid website.");
   }
 
+  const salt = bytesToHex(crypto.getRandomValues(new Uint8Array(16)));
+  const hash = await hashPassword(WEBLOCK_FIXED_PASSWORD, salt);
   const { locks = {} } = await chrome.storage.local.get("locks");
   const ruleId = locks[normalizedHost]?.ruleId ??
     Math.max(0, ...Object.values(locks).map((lock) => lock.ruleId || 0)) + 1;
@@ -67,12 +75,31 @@ async function createLock(host, salt, hash) {
   locks[normalizedHost] = {
     salt,
     hash,
+    passwordVersion: PASSWORD_VERSION,
     ruleId,
     expiresAt: Date.now() + LOCK_DURATION_MS
   };
 
   await chrome.storage.local.set({ locks });
   await refreshLocks();
+}
+
+async function migrateLocks() {
+  const { locks = {} } = await chrome.storage.local.get("locks");
+  let changed = false;
+
+  for (const lock of Object.values(locks)) {
+    if (lock.expiresAt <= Date.now() || lock.passwordVersion === PASSWORD_VERSION) {
+      continue;
+    }
+
+    lock.salt = bytesToHex(crypto.getRandomValues(new Uint8Array(16)));
+    lock.hash = await hashPassword(WEBLOCK_FIXED_PASSWORD, lock.salt);
+    lock.passwordVersion = PASSWORD_VERSION;
+    changed = true;
+  }
+
+  if (changed) await chrome.storage.local.set({ locks });
 }
 
 function isValidHostname(host) {

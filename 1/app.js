@@ -9,8 +9,6 @@ if (new URLSearchParams(location.search).get("mode") === "unlock") {
 
 function initializePopup() {
   const form = document.querySelector("#lock-form");
-  const passwordInput = document.querySelector("#password");
-  const confirmInput = document.querySelector("#confirm-password");
   const hostLabel = document.querySelector("#current-host");
   const siteState = document.querySelector("#site-state");
   const message = document.querySelector("#message");
@@ -40,19 +38,9 @@ function initializePopup() {
     event.preventDefault();
     message.textContent = "";
 
-    if (passwordInput.value !== confirmInput.value) {
-      message.textContent = "兩次輸入的密碼不一致。";
-      confirmInput.focus();
-      return;
-    }
-
-    const salt = randomHex(16);
-    const hash = await hashPassword(passwordInput.value, salt);
     const result = await chrome.runtime.sendMessage({
       type: "create-lock",
-      host: currentHost,
-      salt,
-      hash
+      host: currentHost
     });
 
     if (!result?.ok) {
@@ -94,24 +82,28 @@ function initializePopup() {
     const currentLock = locks[currentHost];
     siteState.textContent = currentLock?.expiresAt > Date.now()
       ? `已鎖定，${formatRemaining(currentLock.expiresAt - Date.now())}後自動解除`
-      : "設定密碼後，造訪網站時會要求輸入密碼";
+      : "鎖定網站後，造訪時會要求輸入固定密碼";
   }
 }
 
 function initializeUnlock() {
   const form = document.querySelector("#unlock-form");
   const passwordInput = document.querySelector("#unlock-password");
+  const fixedPassword = document.querySelector("#fixed-password");
   const targetHost = document.querySelector("#target-host");
   const errorMessage = document.querySelector("#error-message");
   let currentTabId;
 
-  passwordInput.addEventListener("paste", (event) => event.preventDefault());
-  passwordInput.addEventListener("drop", (event) => event.preventDefault());
+  for (const eventName of ["copy", "cut", "paste", "drop"]) {
+    passwordInput.addEventListener(eventName, (event) => event.preventDefault());
+  }
   passwordInput.addEventListener("beforeinput", (event) => {
-    if (event.inputType === "insertFromPaste" || event.inputType === "insertFromDrop") {
+    if (event.inputType.startsWith("insertFrom") || event.inputType === "deleteByCut") {
       event.preventDefault();
     }
   });
+  fixedPassword.addEventListener("copy", (event) => event.preventDefault());
+  fixedPassword.addEventListener("cut", (event) => event.preventDefault());
 
   initialize();
 
@@ -131,6 +123,7 @@ function initializeUnlock() {
 
     if (target) {
       targetHost.textContent = new URL(target).hostname;
+      fixedPassword.textContent = WEBLOCK_FIXED_PASSWORD;
       form.hidden = false;
       passwordInput.focus();
       return;
@@ -164,27 +157,4 @@ function formatRemaining(milliseconds) {
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
   return hours > 0 ? `${hours} 小時 ${remainingMinutes} 分` : `${remainingMinutes} 分鐘`;
-}
-
-function randomHex(length) {
-  return Array.from(crypto.getRandomValues(new Uint8Array(length)), (byte) =>
-    byte.toString(16).padStart(2, "0")
-  ).join("");
-}
-
-async function hashPassword(password, salt) {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(password),
-    "PBKDF2",
-    false,
-    ["deriveBits"]
-  );
-  const saltBytes = Uint8Array.from(salt.match(/.{2}/g), (byte) => parseInt(byte, 16));
-  const bits = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", hash: "SHA-256", salt: saltBytes, iterations: 210000 },
-    key,
-    256
-  );
-  return Array.from(new Uint8Array(bits), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }

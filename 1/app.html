@@ -24,10 +24,7 @@
       </section>
 
       <form id="lock-form" class="lock-form">
-        <label for="password">設定密碼</label>
-        <input id="password" name="password" type="password" autocomplete="new-password" required>
-        <label for="confirm-password">再次輸入</label>
-        <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required>
+        <p class="fixed-password-note">鎖定網站時會使用固定密碼。</p>
         <button id="lock-button" class="primary-button" type="submit">鎖定此網站</button>
       </form>
 
@@ -55,6 +52,7 @@
         <p id="target-host" class="target-host">正在確認網站…</p>
         <form id="unlock-form" class="unlock-form" hidden>
           <label for="unlock-password">輸入網站密碼</label>
+          <p class="fixed-password-note">固定密碼：<code id="fixed-password"></code></p>
           <div class="password-row">
             <input id="unlock-password" type="password" autocomplete="off" required autofocus>
             <button type="submit" class="unlock-button" aria-label="驗證密碼" title="驗證密碼">→</button>
@@ -65,6 +63,7 @@
       </div>
       <footer class="gate-footer">WEBLOCK <span>KEEP YOUR ATTENTION YOURS</span></footer>
     </main>
+    <script src="password.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
