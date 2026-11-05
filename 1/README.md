@@ -4,6 +4,9 @@ A Chrome Manifest V3 extension that protects selected websites with a password
 for up to 12 hours. A correct password permits the current navigation; later
 visits still require the password until the lock expires.
 
+The popup and unlock screen share `app.html` and `app.js`. Chrome still requires
+a separate manifest and background service worker.
+
 ## Install for development
 
 1. Open `chrome://extensions` in Chrome and enable **Developer mode**.

@@ -102,7 +102,7 @@ async function refreshLocks() {
     priority: 1,
     action: {
       type: "redirect",
-      redirect: { extensionPath: "/lock.html" }
+      redirect: { extensionPath: "/app.html?mode=unlock" }
     },
     condition: {
       urlFilter: `||${host}^`,

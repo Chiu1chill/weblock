@@ -16,6 +16,6 @@
   },
   "action": {
     "default_title": "Weblock",
-    "default_popup": "popup.html"
+    "default_popup": "app.html"
   }
 }

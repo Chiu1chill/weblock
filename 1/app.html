@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body class="popup-page">
-    <main class="popup-shell">
+    <main id="popup-view" class="popup-shell">
       <header class="brand-row">
         <div class="brand-mark" aria-hidden="true">W</div>
         <div>
@@ -43,6 +43,28 @@
       </section>
       <footer>密碼以加鹽雜湊方式儲存</footer>
     </main>
-    <script src="popup.js"></script>
+
+    <main id="gate-view" class="gate-shell" hidden>
+      <div class="gate-topline">
+        <div class="brand-mark" aria-hidden="true">W</div>
+        <span>WEBLOCK / ACCESS GATE</span>
+      </div>
+      <div class="gate-content">
+        <p class="eyebrow">PRIVATE BROWSING</p>
+        <h1>這個網站<br>目前已鎖定。</h1>
+        <p id="target-host" class="target-host">正在確認網站…</p>
+        <form id="unlock-form" class="unlock-form" hidden>
+          <label for="unlock-password">輸入網站密碼</label>
+          <div class="password-row">
+            <input id="unlock-password" type="password" autocomplete="off" required autofocus>
+            <button type="submit" class="unlock-button" aria-label="驗證密碼" title="驗證密碼">→</button>
+          </div>
+          <p id="error-message" class="error-message" role="alert" aria-live="polite"></p>
+        </form>
+        <p class="expiry-note"><span class="expiry-dot"></span>此鎖定將於 12 小時後自動解除</p>
+      </div>
+      <footer class="gate-footer">WEBLOCK <span>KEEP YOUR ATTENTION YOURS</span></footer>
+    </main>
+    <script src="app.js"></script>
   </body>
 </html>
