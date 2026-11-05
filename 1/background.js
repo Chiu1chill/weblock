@@ -36,14 +36,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       return { ok: true };
     }
 
-    if (message.type === "remove-lock") {
-      const { locks = {} } = await chrome.storage.local.get("locks");
-      delete locks[message.host];
-      await chrome.storage.local.set({ locks });
-      await refreshLocks();
-      return { ok: true };
-    }
-
     if (message.type === "get-target") {
       const key = String(message.tabId);
       const target = (await chrome.storage.session.get(key))[key];

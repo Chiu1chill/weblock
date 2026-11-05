@@ -9,16 +9,6 @@ const emptyState = document.querySelector("#empty-state");
 const lockCount = document.querySelector("#lock-count");
 let currentHost = null;
 
-for (const input of [passwordInput, confirmInput]) {
-  input.addEventListener("paste", (event) => event.preventDefault());
-  input.addEventListener("drop", (event) => event.preventDefault());
-  input.addEventListener("beforeinput", (event) => {
-    if (event.inputType === "insertFromPaste" || event.inputType === "insertFromDrop") {
-      event.preventDefault();
-    }
-  });
-}
-
 initialize();
 
 async function initialize() {
@@ -85,18 +75,7 @@ async function renderLocks() {
     time.textContent = `剩餘 ${formatRemaining(lock.expiresAt - Date.now())}`;
     details.append(name, time);
 
-    const removeButton = document.createElement("button");
-    removeButton.className = "remove-button";
-    removeButton.type = "button";
-    removeButton.title = `解除 ${host} 的鎖定`;
-    removeButton.setAttribute("aria-label", `解除 ${host} 的鎖定`);
-    removeButton.textContent = "解除";
-    removeButton.addEventListener("click", async () => {
-      await chrome.runtime.sendMessage({ type: "remove-lock", host });
-      await renderLocks();
-    });
-
-    item.append(details, removeButton);
+    item.append(details);
     lockList.append(item);
   }
 

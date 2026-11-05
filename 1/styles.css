@@ -107,8 +107,6 @@ button { cursor: pointer; }
 .lock-details { display: grid; min-width: 0; gap: 2px; }
 .lock-details strong { overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .lock-details span { color: var(--muted); font-size: 10px; }
-.remove-button { padding: 5px 7px; border: 1px solid var(--line); background: transparent; color: var(--coral); font-size: 10px; }
-.remove-button:hover { border-color: var(--coral); }
 .empty-state { margin: 12px 0 14px; color: var(--muted); font-size: 11px; }
 .popup-shell footer { margin-top: 12px; color: #88948d; font-family: "SFMono-Regular", Consolas, monospace; font-size: 9px; }
 
