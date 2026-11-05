@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Weblock</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="popup-page">
+    <main class="popup-shell">
+      <header class="brand-row">
+        <div class="brand-mark" aria-hidden="true">W</div>
+        <div>
+          <p class="eyebrow">BROWSER CONTROL</p>
+          <h1>Weblock</h1>
+        </div>
+        <span class="duration-tag">12 小時</span>
+      </header>
+
+      <section class="current-site" aria-live="polite">
+        <span class="section-label">目前網站</span>
+        <strong id="current-host">讀取中…</strong>
+        <p id="site-state" class="site-state"></p>
+      </section>
+
+      <form id="lock-form" class="lock-form">
+        <label for="password">設定密碼</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" required>
+        <label for="confirm-password">再次輸入</label>
+        <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required>
+        <button id="lock-button" class="primary-button" type="submit">鎖定此網站</button>
+      </form>
+
+      <p id="message" class="message" role="status" aria-live="polite"></p>
+
+      <section class="locks-section">
+        <div class="list-heading">
+          <h2>鎖定中的網站</h2>
+          <span id="lock-count" class="count">0</span>
+        </div>
+        <ul id="lock-list" class="lock-list"></ul>
+        <p id="empty-state" class="empty-state">目前沒有鎖定的網站</p>
+      </section>
+      <footer>密碼以加鹽雜湊方式儲存</footer>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>
